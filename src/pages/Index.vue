@@ -20,6 +20,14 @@
           <q-card flat>
             <q-card-section>
               <q-btn @click="tab='chat'">VER LOG</q-btn>
+              <q-select
+                outlined
+                v-model="seelctRegex"
+                @input="onChageRegex"
+                label="FILE REGEX"
+                emit-value
+                :options="listRegexs"
+              ></q-select>
               <q-input outlined v-model="strRegx" label="regex" placeholder="LOG"/>
               <q-input
                 outlined
@@ -34,7 +42,11 @@
         <q-tab-panel name="chat">
           <div class="row">
             <div class="col">
-              <q-select outlined v-model="username" label="@Username" :options="listsUsernames"></q-select>
+              <q-select outlined v-model="username" label="@Username" :options="listsUsernames">
+                <template v-if="username" v-slot:append>
+                  <q-icon name="cancel" @click.stop="username = null" class="cursor-pointer"/>
+                </template>
+              </q-select>
             </div>
             <div class="col">
               <q-input outlined v-model="search" label="PESQUISAR"></q-input>
@@ -95,6 +107,45 @@ export default {
 
       strRegx: `LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> (.*?) \\| (.*)`,
       logtxt: `LOG - SV: 1 | 00:00:00 00/00/0000 => username | texto`,
+      seelctRegex: "chat",
+      listRegexs: [
+        {
+          label: "chat",
+          value: "chat",
+          regex:
+            "LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> (.*?) \\| (.*)"
+        },
+        {
+          label: "admin",
+          value: "admin",
+          regex:
+            "LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> O .*? \\((.*?)\\) (.*)"
+        },
+        {
+          label: "antiCheat",
+          value: "antiCheat",
+          regex:
+            "LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> O (usuário .*?) (.*)"
+        },
+        {
+          label: "homesLog",
+          value: "homesLog",
+          regex:
+            "LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> (.*?)) (.*)"
+        },
+        {
+          label: "jailLog",
+          value: "jailLog",
+          regex:
+            "LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> (.*?) (.*)"
+        },
+        {
+          label: "staffLog",
+          value: "staffLog",
+          regex:
+            "LOG - \\w+: \\d+ \\| (\\d{2}\\:\\d{2}\\:\\d{2}) (\\d{2}\\/\\d{2}\\/\\d{4}) \\=\\> O STAFF (.*?) (.*)"
+        }
+      ],
       logs: [],
       username: ""
     };
@@ -150,11 +201,20 @@ export default {
           hora: "Error Regex",
           data: "Error Regex",
           username: "Error Regex na linha -" + linha,
-          msg: String(error),
+          msg: txt,
           full: "Error Regex",
           linha
         };
       }
+    },
+    onChageRegex(type) {
+      const row = this.listRegexs.find(v => v.value == type);
+      if (!row) {
+        return;
+      }
+      debugger;
+      // console.log(data);
+      this.strRegx = row.regex;
     },
     randomBackgroundColor(seed) {
       return this.colors[seed.length % this.colors.length];
