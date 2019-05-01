@@ -20,6 +20,7 @@
           <q-card flat>
             <q-card-section>
               <q-btn @click="tab='chat'">VER LOG</q-btn>
+              <open-file @load="(v)=>logtxt=v"/>
               <q-select
                 outlined
                 v-model="seelctRegex"
@@ -77,7 +78,9 @@
 <style></style>
 
 <script>
+import openFile from "components/openFile.vue";
 export default {
+  components: { openFile },
   name: "PageIndex",
   data() {
     return {

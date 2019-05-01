@@ -19,7 +19,8 @@
         <q-tab-panel name="data">
           <q-card flat>
             <q-card-section>
-              <q-btn @click="tab='results'">DATA</q-btn>
+              <open-file @load="(v)=>jsonString=v"/>
+              <q-btn @click="tab='results'" icon="system_update" flat>PROCESSAR DADOS</q-btn>
               <q-input
                 outlined
                 type="textarea"
@@ -44,23 +45,25 @@
             </div>
           </div>-->
 
+          <div class="row">
+            <div class="col">
+              <q-input outlined v-model="search" label="PESQUISAR"></q-input>
+            </div>
+            <div class="col">
+              <q-btn
+                color="primary"
+                icon="cloud_download"
+                flat
+                label="Download"
+                @click="download()"
+              ></q-btn>
+            </div>
+          </div>
           <div class="q-pa-md row justify-center">
             <div style="width: 100%; max-width: 900px">
-              <!-- <q-chat-message
-                v-for="(item,index) in logArrSearch"
-                :key="index"
-                :name="`<b>${item.username}</b> - line ${item.linha}`"
-                :text="[item.msg]"
-                text-sanitize
-                :stamp="`${item.data} ${item.hora}`"
-                text-color="white"
-                :bg-color="randomBackgroundColor(item.username)"
-                :sent="item.username===username"
-              />-->
-
               <q-table
                 title="PERGUNTA"
-                :data="data"
+                :data="dataSearch"
                 :columns="columns"
                 row-key="name"
                 :filter="filter"
@@ -74,9 +77,6 @@
                     :style="props.selected ? 'transform: scale(0.95);' : ''"
                   >
                     <q-card :class="props.selected ? 'bg-grey-2' : ''">
-                      <!-- <q-card-section>
-                        <q-checkbox dense v-model="props.selected" :label="props.row.name"/>
-                      </q-card-section>-->
                       <!-- <q-separator/> -->
                       <q-list bordered separator>
                         <q-item
@@ -100,6 +100,17 @@
                             />
                             <br>
                           </q-item-section>
+                        </q-item>
+                        <q-item>
+                          <q-item>
+                            <q-btn
+                              flat
+                              color="red"
+                              icon="delete"
+                              label="REMOVER"
+                              @click="removeItem(props.row.index)"
+                            ></q-btn>
+                          </q-item>
                         </q-item>
                       </q-list>
                       <!-- {{props}} -->
@@ -128,7 +139,10 @@
 <style></style>
 
 <script>
+import openFile from "components/openFile.vue";
+
 export default {
+  components: { openFile },
   name: "PageIndex",
   data() {
     return {
@@ -160,18 +174,37 @@ export default {
       data: [],
       selected: [],
       filter: "",
-      username: ""
+      username: "",
+      search: ""
     };
   },
   mounted() {},
-  computed: {},
+  computed: {
+    dataSearch: {
+      get() {
+        return this.data.filter(v => {
+          for (let x in v) {
+            let txt = String(v[x]).toUpperCase();
+            if (txt.includes(String(this.search).toUpperCase())) {
+              return true;
+            }
+          }
+          return false;
+        });
+      }
+    }
+  },
   watch: {
     jsonString: "jsonData"
   },
   methods: {
     jsonData() {
       try {
-        this.data = JSON.parse(this.jsonString);
+        let data = JSON.parse(this.jsonString);
+        data.forEach((v, i) => {
+          v.index = i;
+        });
+        this.data = data;
       } catch (error) {
         console.log(error);
       }
@@ -181,6 +214,20 @@ export default {
     },
     randomBackgroundColor(seed) {
       return this.colors[seed.length % this.colors.length];
+    },
+    removeItem(index) {
+      this.data.splice(index, 1);
+    },
+    download() {
+      var text = JSON.stringify(this.data);
+      var dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(text));
+      var dlAnchorElem = document.createElement("a");
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", "listas.json");
+      dlAnchorElem.click();
+      dlAnchorElem.remove();
     }
   }
 };
