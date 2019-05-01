@@ -210,7 +210,7 @@ export default {
       }
     },
     getType(txt) {
-      return txt.length > 126 ? "textarea" : "text";
+      return txt.length > 126 ? "textarea" : "textarea";
     },
     randomBackgroundColor(seed) {
       return this.colors[seed.length % this.colors.length];
