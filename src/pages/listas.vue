@@ -219,14 +219,17 @@ export default {
       this.data.splice(index, 1);
     },
     download() {
+      console.log("------>donwload");
       var text = JSON.stringify(this.data);
       var dataStr =
         "data:text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(text));
       var dlAnchorElem = document.createElement("a");
+
       dlAnchorElem.setAttribute("href", dataStr);
       dlAnchorElem.setAttribute("download", "listas.json");
       dlAnchorElem.click();
+      console.log("------>donwload", dataStr, dlAnchorElem);
       dlAnchorElem.remove();
     }
   }
